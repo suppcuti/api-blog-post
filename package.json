@@ -18,11 +18,12 @@
     "@apollo/client": "^3.13.1",
     "@tailwindcss/postcss": "^4",
     "@types/he": "^1.2.3",
-    "@types/node": "^20",
+    "@types/next": "^8.0.7",
+    "@types/node": "^20.17.23",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "graphql": "^16.10.0",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5.8.2"
   }
 }

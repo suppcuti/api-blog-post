@@ -9,6 +9,7 @@ const client = new ApolloClient({
 });
 
 export default function Home() {
+  
   return (
     <ApolloProvider client={client}>
       <div className="min-h-screen bg-gray-100">
