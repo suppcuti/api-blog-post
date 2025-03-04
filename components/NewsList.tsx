@@ -1,16 +1,38 @@
-import { useQuery } from "@apollo/client";
-import { GET_BLOG_POSTS } from "../app/queries";
+import { gql, useQuery } from "@apollo/client";
 import Link from "next/link";
-import he from "he";
 
-const NewsList = () => {
-  const { loading, error, data } = useQuery(GET_BLOG_POSTS, {
+const GET_PRODUCT_DAILY_SALES = gql`
+  query getProductDailySales(
+    $filter: DailySaleFilterInput
+    $pageSize: Int
+    $currentPage: Int
+  ) {
+    DailySales(filter: $filter, pageSize: $pageSize, currentPage: $currentPage) {
+      items {
+        items {
+          product {
+            sku
+            name
+            url_key
+            image {
+              url
+            }
+          }
+          sale_price
+          price_original
+        }
+      }
+      total_count
+    }
+  }
+`;
+
+export default function Home() {
+  const { loading, error, data } = useQuery(GET_PRODUCT_DAILY_SALES, {
     variables: {
-      filter: { category_id: { eq: 19 } },
-      pageSize: 5,
+      filter: { sale_type: { eq: "thuong-hieu" } },
+      pageSize: 10,
       currentPage: 1,
-      sortFiled: "publish_time",
-      allPosts: false,
     },
   });
 
@@ -19,22 +41,22 @@ const NewsList = () => {
 
   return (
     <div className="container mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-4 text-black ">Tin tức mới nhất</h2>
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {data.blogPosts.items.map((post: any) => (
-          <div key={post.post_url} className="border rounded-lg overflow-hidden shadow-lg">
-            <img src={post.featured_image} alt={post.title} className="w-full h-48 object-cover" />
-            <div className="p-4">
-              <h3 className="text-lg text-black  font-semibold">{post.title}</h3>
-              <p className="text-gray-600 text-sm">{he.decode(post.meta_description) || "N/A"}</p>
-              <p className="text-gray-500 text-xs mt-2">Đăng bởi: {post.author?.name || "N/A"} - {new Date(post.publish_time).toLocaleDateString()}</p>
-              <Link href={post.post_url} className="text-blue-500 mt-2 inline-block">Đọc tiếp</Link>
+      <h2 className="text-2xl font-bold mb-4 text-black">Sản phẩm giảm giá</h2>
+      <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-4">
+        {data.DailySales.items.map((sale: any) =>
+          sale.items.map((item: any) => (
+            <div key={item.product.sku} className="border rounded-lg shadow-lg p-4">
+              <img src={item.product.image.url} alt={item.product.name} className="w-full h-70 object-cover" />
+              <h3 className="text-lg font-semibold text-black">{item.product.name}</h3>
+              <p className="text-red-500 font-bold">Giá giảm: {item.sale_price}₫</p>
+              <p className="text-gray-500 line-through">Giá gốc: {item.price_original}₫</p>
+              <Link href={`/product/${item.product.sku}`} className="text-blue-500 mt-2 inline-block">
+                Xem chi tiết
+              </Link>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
     </div>
   );
-};
-
-export default NewsList;
+}
