@@ -27,22 +27,18 @@ const GET_PRODUCT_DAILY_SALES = gql`
   }
 `;
 
-// ✅ Định nghĩa kiểu dữ liệu cho params
+// ✅ Sửa lỗi kiểu dữ liệu params
 interface ProductDetailProps {
   params: { sku: string };
 }
 
-// ✅ Sử dụng `async` component để chờ params
 export default async function ProductDetail({ params }: ProductDetailProps) {
-  // Chờ Next.js xử lý params
-  const { sku } = await Promise.resolve(params);
-
   const client = getClient();
   const { data, error } = await client.query({
     query: GET_PRODUCT_DAILY_SALES,
     variables: {
-      filter: { sale_type: { eq: "thuong-hieu" } }, 
-      pageSize: 50, 
+      filter: { sale_type: { eq: "thuong-hieu" } },
+      pageSize: 50,
       currentPage: 1,
     },
   });
@@ -53,7 +49,7 @@ export default async function ProductDetail({ params }: ProductDetailProps) {
   // 🔍 Lọc sản phẩm theo SKU từ params
   const product = data.DailySales.items
     .flatMap((sale: any) => sale.items)
-    .find((item: any) => item.product.sku === sku);
+    .find((item: any) => item.product.sku === params.sku);
 
   if (!product) return <p className="text-gray-500">Không tìm thấy sản phẩm</p>;
 
